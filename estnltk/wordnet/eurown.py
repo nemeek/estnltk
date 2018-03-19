@@ -1063,6 +1063,11 @@ class ParseError(Exception):
     def __str__(self):
         return repr(self.value)
 
+class WNWBParser(object):
+    """
+    """
+    pass
+
 
 class Parser(object):
     """Parser for Polaris import-export files.
