@@ -1066,7 +1066,9 @@ class ParseError(Exception):
 class WNWBParser(object):
     """
     """
-    pass
+    def __init__(self, root = ''):
+        pass
+        
 
 
 class Parser(object):
