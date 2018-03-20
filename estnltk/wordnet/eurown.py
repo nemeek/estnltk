@@ -1066,6 +1066,12 @@ class ParseError(Exception):
 class WNWBParser(object):
     """
     """
+    from config import WNWB_PREFIX, WNWB_LEXID, HYPERNYM_IDS, HYPONYM_IDS, APP_CONFIG_SECRET_KEY, SYNSET_RELATIONS
+
+    WNWB_SNSET = WNWB_PREFIX + 'synset/'
+    OMW_NAMES = set([x[1] for x in SYNSET_RELATIONS])
+    SNSET_OMW_REL = [{'omw_name':x, 'ids':[y[0] for y in SYNSET_RELATIONS if y[1] == x]} for x in OMW_NAMES if x]
+
     def __init__(self, root = ''):
         pass
         
