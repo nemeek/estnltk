@@ -320,6 +320,7 @@ class Synset(object):
                                   )
         return out
 
+
 class Instance(Synset):
     def __init__(self, number='', variants=None,
                      internal_links=None, eq_links=None,
@@ -1136,37 +1137,4 @@ def write_xml(synsets):
               )
 
 
-def main(filename):
-    out = read_file(filename)
-    for i in out:
-        print(i)
-        print()
-
-if __name__ == '__kain__':
-    import sys
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filename',
-                        help="Lexicon file name")
-    
-    args = parser.parse_args()
-    
-    main(args.filename)
-    print("--- {} seconds ---".format(time.time() - start_time),
-          file = sys.stderr)
-
-if __name__ == '__sain__':
-    a = Synset('43','n')
-    write_xml([a])
-
-
-if __name__ == '__main__':
-    a = Lexicon(filename = 'leksikonitest.xml',
-                name = 'test')
-    # a.write_xml()
-    b = Lexicon(filename = '../data/estwn/estwn-et-2.1.0.wip.xml')
-    b.read_xml()
-    
-    b.filename = 'test21a.xml'
-    b.write()
             
