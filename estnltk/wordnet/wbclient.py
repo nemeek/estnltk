@@ -8,6 +8,8 @@ import requests
 
 from wnconfig import WNWB_PREFIX, WNWB_LEXID, HYPERNYM_IDS, HYPONYM_IDS, APP_CONFIG_SECRET_KEY, SYNSET_RELATIONS
 
+from eurown import Synset
+
 WNWB_SNSET = WNWB_PREFIX + 'synset/'
 OMW_NAMES = set([x[1] for x in SYNSET_RELATIONS])
 SNSET_OMW_REL = [{'omw_name':x,
@@ -45,8 +47,25 @@ def main():
 
     args = parser.parse_args()
     
-    print(make_query(WNWB_LEXID, args.word, WNWB_SNSET))
+    tulem = make_query(WNWB_LEXID, args.word, WNWB_SNSET)
 
+    uus = tulem[0]
+    for i,j in uus.items():
+        print(i,type(j))
+    show = ['id','label','synset_type','variants_str','sensess']
+    for i,j in uus.items():
+        if i in show:
+            print('{}: {}'.format(i,j))
+        elif i == 'senses':
+            for k,n in j[0].items():
+                print(k, type(n))
+                if k in ['lexical_entry','nr']:
+                    print(n)
+
+    for w in tulem:
+        s = Synset()
+        s.wnwb(w)
+        print(s)
 
 if __name__ == "__main__":
     main()

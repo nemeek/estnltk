@@ -243,7 +243,8 @@ class Synset(object):
 
     __slots__ = ['number','pos','variants','definition','internal_links',
                  'eq_links','properties','wordnet_offset',
-                 'add_on_id','fieldname']
+                 'add_on_id','fieldname','lexicon','comment',
+                     'domain']
     
     def __init__(self, number='', pos='', variants=None,
                      definition = None,
@@ -262,6 +263,28 @@ class Synset(object):
         self.fieldname = 'WORD_MEANING'
         self.wordnet_offset = wordnet_offset
         self.add_on_id = add_on_id
+
+        self.lexicon = None
+        self.comment = None
+
+    def wnwb(self, data: dict):
+        """Parses data from wnwb rest service
+
+        Parametres
+        ----------
+        data
+            Result from wnwb rest service that carries info
+            about synset
+
+        """
+        self.lexicon = data['lexicon']
+        self.number, self.pos = data['label'].split('-')
+        self.domain = data['domain']
+        self.comment = data['comment']
+        self.definition = Definition(text = data['primary_definition'])
+
+        self.variants = [Variant(wb = i) for i in data['senses']]
+        
 
     def add_variant(self, variant):
         self.variants.append(variant)
@@ -333,13 +356,13 @@ class Instance(Synset):
         self.fieldname = 'WORD_INSTANCE'
 
 
-class Variant:
+class Variant(object):
     def __init__(self, literal=None, sense=None,
                  gloss=None, examples=None,
                  external_info=None,
                  usage_labels=None, status=None,
                  features=None, translations=None,
-                     synset = None):
+                     synset = None, wb=None):
         self.literal = literal
         self.sense = sense
         self.gloss = gloss
@@ -350,6 +373,14 @@ class Variant:
         self.features = features or []
         self.translations = translations or []
         self.synset = synset or None
+
+        if wb:
+            self.wnwb(wb)
+
+    def wnwb(self, data: dict):
+        self.literal = data['lexical_entry']['lemma']
+        self.sense = data['nr']
+        self.gloss = data['primary_definition']
 
     def add_example(self, example):
         self.examples.append(example)
