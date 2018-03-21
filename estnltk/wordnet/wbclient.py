@@ -3,7 +3,7 @@
 """Wordnet workbench client
 
 """
-
+import sys
 import requests
 
 from wnconfig import WNWB_PREFIX, WNWB_LEXID, HYPERNYM_IDS, HYPONYM_IDS, APP_CONFIG_SECRET_KEY, SYNSET_RELATIONS
@@ -22,8 +22,10 @@ def make_query(lexid, search, root):
     r = requests.get(root, params={
         'lexid':lexid, 'word':search}
                          )
+    print(r.url)
     if r.status_code != 200:
-        return flash('Ei saa serveriga ühendust!')
+        print ('Ei saa serveriga ühendust!', sys.stderr)
+        return None
     else:
         vastus = r.json()
         tulem = vastus['results']
@@ -34,9 +36,17 @@ def make_query(lexid, search, root):
         return tulem
 
     
-def main(otsi):
-    print(make_query(WNWB_LEXID, otsi, WNWB_SNSET))
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description = 'connect to wnwb server')
+    parser.add_argument("word")
+
+    args = parser.parse_args()
+    
+    print(make_query(WNWB_LEXID, args.word, WNWB_SNSET))
 
 
 if __name__ == "__main__":
-    main('jama')
+    main()
