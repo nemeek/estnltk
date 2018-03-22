@@ -51,6 +51,34 @@ start_time = time.time()
 from lxml import etree
 from lxml.etree import fromstring, tostring
 
+import sys
+import requests
+
+from wnconfig import WNWB_PREFIX, WNWB_LEXID, HYPERNYM_IDS, HYPONYM_IDS, APP_CONFIG_SECRET_KEY, SYNSET_RELATIONS
+
+
+def make_wnwb_query(lexid, search, root):
+    """
+    Make wnwb query 
+    """
+    tulem = []
+    r = requests.get(root, params={
+        'lexid':lexid, 'word':search}
+                         )
+    print(r.url)
+    if r.status_code != 200:
+        print ('Ei saa serveriga ühendust!', sys.stderr)
+        return None
+    else:
+        vastus = r.json()
+        tulem = vastus['results']
+        if vastus['count'] > len(vastus['results']):
+            r = requests.get(vastus['next'])
+            if r.status_code == 200:
+                tulem.extend(r.json()['results'])
+        return tulem
+
+
 
 def _pos_from_number(iStr):
     return iStr.split('-')[-1]
@@ -244,7 +272,7 @@ class Synset(object):
     __slots__ = ['number','pos','variants','definition','internal_links',
                  'eq_links','properties','wordnet_offset',
                  'add_on_id','fieldname','lexicon','comment',
-                     'domain']
+                 'domain', 'wnwbid']
     
     def __init__(self, number='', pos='', variants=None,
                      definition = None,
@@ -266,6 +294,7 @@ class Synset(object):
 
         self.lexicon = None
         self.comment = None
+        self.wnwbid = None
 
     def wnwb(self, data: dict):
         """Parses data from wnwb rest service
@@ -277,6 +306,7 @@ class Synset(object):
             about synset
 
         """
+        self.wnwbid = data['id']
         self.lexicon = data['lexicon']
         self.number, self.pos = data['label'].split('-')
         self.domain = data['domain']
@@ -284,7 +314,7 @@ class Synset(object):
         self.definition = Definition(text = data['primary_definition'])
 
         self.variants = [Variant(wb = i) for i in data['senses']]
-        self.internal_links = [Variant(wb = i) for i in data['senses']]        
+        self.internal_links = [InternalLink(wb = i) for i in data['relations'] if i['a_synset'] == self.wnwbid]        
         
 
     def add_variant(self, variant):
@@ -343,6 +373,7 @@ class Synset(object):
                                   '\n'.join([str(i) for i in self.eq_links])
                                   )
         return out
+
 
 class Instance(Synset):
     def __init__(self, number='', variants=None,
@@ -548,7 +579,7 @@ class ExternalInfo(object):
 class InternalLink:
     def __init__(self, name=None, target_concept=None,
                      features=None,
-                     external_info=None):
+                     external_info=None, wb=None):
         self.name = name
         self.target_concept = target_concept
         self.external_info = external_info or []
@@ -556,6 +587,15 @@ class InternalLink:
         self.relation_label = 'RELATION'
         self.target_type = 'TARGET_CONCEPT'
         self.source_id = None
+
+        if wb:
+            self.wnwb(wb)
+
+    def wnwb(self, data: dict):
+        self.name = [i[-1] for i in SYNSET_RELATIONS if i[0] == data['rel_type']][0]
+        # TODO:
+        # self.target_concept
+        
 
     def add_feature(self, feature):
         self.features.append(feature)
@@ -1168,37 +1208,4 @@ def write_xml(synsets):
               )
 
 
-def main(filename):
-    out = read_file(filename)
-    for i in out:
-        print(i)
-        print()
-
-if __name__ == '__kain__':
-    import sys
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filename',
-                        help="Lexicon file name")
-    
-    args = parser.parse_args()
-    
-    main(args.filename)
-    print("--- {} seconds ---".format(time.time() - start_time),
-          file = sys.stderr)
-
-if __name__ == '__sain__':
-    a = Synset('43','n')
-    write_xml([a])
-
-
-if __name__ == '__main__':
-    a = Lexicon(filename = 'leksikonitest.xml',
-                name = 'test')
-    # a.write_xml()
-    b = Lexicon(filename = '../data/estwn/estwn-et-2.1.0.wip.xml')
-    b.read_xml()
-    
-    b.filename = 'test21a.xml'
-    b.write()
             

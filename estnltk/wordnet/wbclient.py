@@ -61,6 +61,14 @@ def main():
                 print(k, type(n))
                 if k in ['lexical_entry','nr']:
                     print(n)
+        elif i == 'relations':
+            print (5*'--')
+            print (len(j))
+            for k,n in j[0].items():
+                print(k, type(n))
+                print('   {}'.format(n))
+                # if k in ['lexical_entry','nr']:
+                #     print(n)
 
     for w in tulem:
         s = Synset()
