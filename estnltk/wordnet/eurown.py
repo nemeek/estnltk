@@ -51,6 +51,8 @@ start_time = time.time()
 from lxml import etree
 from lxml.etree import fromstring, tostring
 
+from wnconfig import SYNSET_RELATIONS
+
 
 def _pos_from_number(iStr):
     return iStr.split('-')[-1]
@@ -244,7 +246,7 @@ class Synset(object):
     __slots__ = ['number','pos','variants','definition','internal_links',
                  'eq_links','properties','wordnet_offset',
                  'add_on_id','fieldname','lexicon','comment',
-                     'domain']
+                 'domain', 'wnwbid']
     
     def __init__(self, number='', pos='', variants=None,
                      definition = None,
@@ -266,6 +268,7 @@ class Synset(object):
 
         self.lexicon = None
         self.comment = None
+        self.wnwbid = None
 
     def wnwb(self, data: dict):
         """Parses data from wnwb rest service
@@ -277,6 +280,7 @@ class Synset(object):
             about synset
 
         """
+        self.wnwbid = data['id']
         self.lexicon = data['lexicon']
         self.number, self.pos = data['label'].split('-')
         self.domain = data['domain']
@@ -284,7 +288,7 @@ class Synset(object):
         self.definition = Definition(text = data['primary_definition'])
 
         self.variants = [Variant(wb = i) for i in data['senses']]
-        self.internal_links = [Variant(wb = i) for i in data['senses']]        
+        self.internal_links = [InternalLink(wb = i) for i in data['relations'] if i['a_synset'] == self.wnwbid]        
         
 
     def add_variant(self, variant):
@@ -549,7 +553,7 @@ class ExternalInfo(object):
 class InternalLink:
     def __init__(self, name=None, target_concept=None,
                      features=None,
-                     external_info=None):
+                     external_info=None, wb=None):
         self.name = name
         self.target_concept = target_concept
         self.external_info = external_info or []
@@ -557,6 +561,15 @@ class InternalLink:
         self.relation_label = 'RELATION'
         self.target_type = 'TARGET_CONCEPT'
         self.source_id = None
+
+        if wb:
+            self.wnwb(wb)
+
+    def wnwb(self, data: dict):
+        self.name = [i[-1] for i in SYNSET_RELATIONS if i[0] == data['rel_type']][0]
+        # TODO:
+        # self.target_concept
+        
 
     def add_feature(self, feature):
         self.features.append(feature)
