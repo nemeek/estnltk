@@ -284,6 +284,7 @@ class Synset(object):
         self.definition = Definition(text = data['primary_definition'])
 
         self.variants = [Variant(wb = i) for i in data['senses']]
+        self.internal_links = [Variant(wb = i) for i in data['senses']]        
         
 
     def add_variant(self, variant):
