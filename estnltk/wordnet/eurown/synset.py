@@ -1,3 +1,5 @@
+from backends import format_polaris
+
 class Definition(object):
     def __init__(self, lang='', text='', sourceSense=''):
         self.lang = lang or 'et'
