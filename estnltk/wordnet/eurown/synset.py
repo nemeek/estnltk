@@ -1,3 +1,23 @@
+class Definition(object):
+    def __init__(self, lang='', text='', sourceSense=''):
+        self.lang = lang or 'et'
+        self.text = text or ''
+        self.sourceSense = sourceSense or ''
+
+    def __str__(self):
+        out = format_polaris(2, 'TEXT', self.text)
+        out = '{}\n{}'.format(out,
+                              format_polaris(2, 'LANGUAGE', self.lang,
+                                             None)
+                              )
+        if self.sourceSense:
+            out = '{}\n{}'.format(out,
+                                format_polaris(2, 'SOURCE_SENSE', self.sourceSense,
+                                                None)
+                                )
+        return out
+
+
 class Synset(object):
     def __init__(self, number='', pos='', variants=None,
         definition = None,
