@@ -1,3 +1,5 @@
+from eurown.backends import format_polaris
+
 class InternalLink:
     def __init__(self, name=None, target_concept=None,
                      features=None,

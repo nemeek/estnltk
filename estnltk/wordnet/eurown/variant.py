@@ -1,3 +1,5 @@
+from eurown.backends import format_polaris
+
 class Variant(object):
     def __init__(self, literal=None, sense=None,
                  gloss=None, examples=None,
