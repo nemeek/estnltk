@@ -1,4 +1,4 @@
-import estnltk.eurown
+import eurown
 
 # content of test_sample.py
 def func(x):

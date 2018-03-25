@@ -1,4 +1,17 @@
-from backends import format_polaris
+# -*- coding: utf-8 -*-
+"""Eurown synset
+
+Example
+-------
+>>> import eurown
+>>> a = eurown.Synset(43,'n')
+>>> b = eurown.Variant('loom',1)
+>>> c = eurown.Variant('elajas',2)
+>>> a.add_variant(b)
+>>> print(a)
+"""
+
+from eurown.backends import format_polaris
 
 class Definition(object):
     def __init__(self, lang='', text='', sourceSense=''):
@@ -41,6 +54,12 @@ class Synset(object):
 
         self.lexicon = None
         self.comment = None
+
+    def read(self, data):
+        """Reads data depending of back system
+
+        """
+        pass
 
     def wnwb(self, data: dict):
         """Parses data from wnwb rest service
