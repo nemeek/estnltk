@@ -1,3 +1,8 @@
+import time
+start_time = time.time()
+
+import sys
+
 from lxml import etree
 from lxml.etree import fromstring, tostring
 
@@ -106,12 +111,15 @@ class Lexicon(object):
             if k in self._xml_attrs and v:
                 self.__dict__[k] = v
 
+        print('Reading synsets...', sys.stderr)
         snsets = [_msn(x) for x in root.xpath("//*[local-name()='Synset']")]
+        print('Reading variants...', sys.stderr)
         variants = [_mvar(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
+        print('Variants read!', sys.stderr)
 
-        print(self.__dict__)
-        for i in snsets:
-            print(i)
+        # print(self.__dict__)
+        # for i in snsets:
+        #     print(i)
 
         for i in variants:#[:3]:
             for k in i:
