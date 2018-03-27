@@ -2,11 +2,50 @@
 
 """Test eurown module
 
+https://docs.python.org/3/library/profile.html
+python -m cProfile [-o output_file] [-s sort_order] myscript.py
+
+http://lxml.de/parsing.html#iterparse-and-iterwalk
+
 """
 
+# Timer
+import atexit
+from time import time, strftime, localtime
+from datetime import timedelta
+
+# Eurown
 import eurown
 
+# Timer
+
+def secondsToStr(elapsed=None):
+    if elapsed is None:
+        return strftime("%Y-%m-%d %H:%M:%S", localtime())
+    else:
+        return str(timedelta(seconds=elapsed))
+
+def log(s, elapsed=None):
+    line = "="*40
+    print(line)
+    print(secondsToStr(), '-', s)
+    if elapsed:
+        print("Elapsed time:", elapsed)
+    print(line)
+    print()
+
+def endlog():
+    end = time()
+    elapsed = end-start
+    log("End Program", secondsToStr(elapsed))
+
+start = time()
+atexit.register(endlog)
+log("Start Program")
+    
+
 def main():
+    
     a = eurown.Synset(43, 'n')
     b = eurown.Variant('loom',1)
     a.add_variant(b)

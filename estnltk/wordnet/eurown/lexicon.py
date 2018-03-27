@@ -121,9 +121,9 @@ class Lexicon(object):
         # for i in snsets:
         #     print(i)
 
-        for i in variants:#[:3]:
-            for k in i:
-                print(k[0])
+        # for i in variants:#[:3]:
+        #     for k in i:
+        #         print(k[0])
 
         vs = [y for x in variants for y in x]
 
@@ -131,8 +131,8 @@ class Lexicon(object):
             vse = vs.pop()
             snsi = [x.add_variant(vse[0]) for x in snsets if (x.number == vse[-1])]
             self.data.append(snsi[0])
-            if len(snsi[0].variants) > 1:
-                print(snsi[0])
+            # if len(snsi[0].variants) > 1:
+            #     print(snsi[0])
                     
 
         # return True
