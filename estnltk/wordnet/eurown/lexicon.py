@@ -84,7 +84,7 @@ def _mvar(element):
     ) for x,z,a,b in s]
 
 
-def make_variant(element: etree.Element, synset: str) -> Variant:
+def make_variant(element: etree.Element, synset: str = None) -> Variant:
     """Finds from LexicalEntry elements these Senses,
     where "synset" attributes are equal to synset parameter.
 
@@ -106,11 +106,18 @@ def make_variant(element: etree.Element, synset: str) -> Variant:
     lexical_entry_id =  element.get('id')
     lemma = element.find('Lemma').get('writtenForm')
     senses = element.findall('Sense')
-    s = [(x.get('id'),
+    if synset:
+        s = [(x.get('id'),
               x.findall('Example'),
               x.get('status'),
               x.get('synset')) for x in senses if x.attrib['synset'] == synset]
-
+    else:
+        s = [(x.get('id'),
+              x.findall('Example'),
+              x.get('status'),
+              x.get('synset')) for x in senses]
+        
+        
     variant = [Variant(
         lemma, x,
         examples=_mex(z),
@@ -170,16 +177,21 @@ class Lexicon(object):
 
         print('Reading synsets...', file=sys.stderr)
         snsets = [make_synset(x) for x in root.xpath("//*[local-name()='Synset']")]
+
+        
         print('Reading variants...', file=sys.stderr)
         otsing = 'estwn-et-266-n'
-        variants = [make_variant(x,
-                            otsing) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(otsing))]
+        # variants = [make_variant(x,y) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(y.number)) for y in snsets]
+        variants = [make_variant(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
+
+        # synohulgad = [print(x.add_variant(make_variant(v, x.number))) for x in snsets for v in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(x.number))]
+        
         print('Variants read!', file=sys.stderr)
-        print(snsets[0])
-        print(15*'#')
-        for i in variants:
-            print (10*'=')
-            print (i)
+        # print(snsets[0])
+        # print(15*'#')
+        # for i in variants:
+        #     print (10*'=')
+        #     print (i)
         # print(variants[0][0])
 
         # print("Mapping...", file=sys.stderr)
