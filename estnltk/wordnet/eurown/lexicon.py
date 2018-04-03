@@ -67,6 +67,27 @@ def _mvar(element):
         synset = b
     ) for x,z,a,b in s]
 
+
+def _mmvar(element, synset):
+    lexical_entry_id =  element.get('id')
+    lemma = element.find('Lemma').get('writtenForm')
+    senses = element.findall('Sense')
+    s = [(x.get('id'),
+              # x.get('synset'),
+              x.findall('Example'),
+              x.get('status'),
+              x.get('synset')) for x in senses if x.attrib['synset'] == synset]
+
+    # variant = Variant(
+    #     literal = lemma
+    #     )
+    return [Variant(
+        lemma, x,
+        examples=_mex(z),
+        status = a,
+        synset = b
+    ) for x,z,a,b in s]
+
 def _mex(iList):
     return [Example(x.text) for x in iList]
 
@@ -115,7 +136,7 @@ class Lexicon(object):
         snsets = [_msn(x) for x in root.xpath("//*[local-name()='Synset']")]
         print('Reading variants...', file=sys.stderr)
         otsing = 'estwn-et-266-n'
-        variants = [_mvar(x) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(otsing))]
+        variants = [_mmvar(x, otsing) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(otsing))]
         print('Variants read!', file=sys.stderr)
         print(snsets[0])
         print(15*'#')
