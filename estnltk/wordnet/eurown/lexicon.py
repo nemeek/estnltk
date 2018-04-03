@@ -169,7 +169,7 @@ class Lexicon(object):
                 self.__dict__[k] = v
 
         print('Reading synsets...', file=sys.stderr)
-        snsets = [_msn(x) for x in root.xpath("//*[local-name()='Synset']")]
+        snsets = [make_synset(x) for x in root.xpath("//*[local-name()='Synset']")]
         print('Reading variants...', file=sys.stderr)
         otsing = 'estwn-et-266-n'
         variants = [make_variant(x,
