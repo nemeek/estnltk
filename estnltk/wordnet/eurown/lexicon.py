@@ -13,7 +13,22 @@ from .variant import Variant, Example
 def _pos_from_number(iStr):
     return iStr.split('-')[-1]
 
-def _msn(element):
+def make_synset(element: etree.Element) -> Synset:
+    """Reads element Synset, makes eurown.Synset object
+    with appropriate data: number, definition, internal and 
+    external relations.
+
+    Parameters
+    ----------
+    element
+        Synset element
+
+    Returns
+    -------
+    Synset
+        appropriate eurown.Synset object
+
+    """
     try:
         defin = Definition(element.find('Definition').get('language'),
                            element.find('Definition').text,
@@ -23,10 +38,7 @@ def _msn(element):
         defin = None
 
     ili = element.attrib['ili']
-    # print(element)
-    # print(element.attrib)
     ili_relations = []
-    # print('ILI: {}'.format(ili))
 
     if ili:
         ili_relation = EqLink(name = 'eq_synonym',
@@ -37,17 +49,21 @@ def _msn(element):
     rels = [InternalLink(x.get('relType'),
                              Synset(x.get('target'))
                         ) for x in relations]
-    # no = _no_from_id(element.get('id'))
     no = element.get('id')    
     pos = _pos_from_number(no)
     snset = Synset(no, definition = defin,
                        pos = pos,
                        internal_links = rels,
                        eq_links = ili_relations)
-    # print(snset)
     return snset
 
+
 def _mvar(element):
+    """Obsolete.
+
+    TODO: delete this function
+
+    """
     lexical_entry_id =  element.get('id')
     lemma = element.find('Lemma').get('writtenForm')
     senses = element.findall('Sense')
@@ -68,25 +84,45 @@ def _mvar(element):
     ) for x,z,a,b in s]
 
 
-def _mmvar(element, synset):
+def make_variant(element: etree.Element, synset: str) -> Variant:
+    """Finds from LexicalEntry elements these Senses,
+    where "synset" attributes are equal to synset parameter.
+
+    Parameters
+    ----------
+    element
+        element in which to search
+
+    synset
+        synset identifier
+
+    Returns
+    -------
+    Variant
+        the only variant that corresponds to this synset.
+        If more than one, rise error.
+
+    """
     lexical_entry_id =  element.get('id')
     lemma = element.find('Lemma').get('writtenForm')
     senses = element.findall('Sense')
     s = [(x.get('id'),
-              # x.get('synset'),
               x.findall('Example'),
               x.get('status'),
               x.get('synset')) for x in senses if x.attrib['synset'] == synset]
 
-    # variant = Variant(
-    #     literal = lemma
-    #     )
-    return [Variant(
+    variant = [Variant(
         lemma, x,
         examples=_mex(z),
         status = a,
         synset = b
     ) for x,z,a,b in s]
+
+    if len(variant) == 1:
+        return variant[0]
+    else:
+        return None # Should rise error
+    
 
 def _mex(iList):
     return [Example(x.text) for x in iList]
@@ -136,15 +172,14 @@ class Lexicon(object):
         snsets = [_msn(x) for x in root.xpath("//*[local-name()='Synset']")]
         print('Reading variants...', file=sys.stderr)
         otsing = 'estwn-et-266-n'
-        variants = [_mmvar(x, otsing) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(otsing))]
+        variants = [make_variant(x,
+                            otsing) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(otsing))]
         print('Variants read!', file=sys.stderr)
         print(snsets[0])
         print(15*'#')
         for i in variants:
             print (10*'=')
-            for k in i:
-                print (2*'-')
-                print(k)
+            print (i)
         # print(variants[0][0])
 
         # print("Mapping...", file=sys.stderr)
