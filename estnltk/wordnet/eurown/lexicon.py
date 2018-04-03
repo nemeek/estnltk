@@ -52,7 +52,7 @@ def _mvar(element):
     lemma = element.find('Lemma').get('writtenForm')
     senses = element.findall('Sense')
     s = [(x.get('id'),
-              x.get('synset'),
+              # x.get('synset'),
               x.findall('Example'),
               x.get('status'),
               x.get('synset')) for x in senses]
@@ -60,12 +60,12 @@ def _mvar(element):
     # variant = Variant(
     #     literal = lemma
     #     )
-    return [(Variant(
+    return [Variant(
         lemma, x,
         examples=_mex(z),
         status = a,
         synset = b
-    ),y) for x,y,z,a,b in s]
+    ) for x,z,a,b in s]
 
 def _mex(iList):
     return [Example(x.text) for x in iList]
@@ -114,14 +114,21 @@ class Lexicon(object):
         print('Reading synsets...', file=sys.stderr)
         snsets = [_msn(x) for x in root.xpath("//*[local-name()='Synset']")]
         print('Reading variants...', file=sys.stderr)
-        variants = [_mvar(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
+        otsing = 'estwn-et-266-n'
+        variants = [_mvar(x) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(otsing))]
         print('Variants read!', file=sys.stderr)
         print(snsets[0])
-        print(variants[0][0][0])
+        print(15*'#')
+        for i in variants:
+            print (10*'=')
+            for k in i:
+                print (2*'-')
+                print(k)
+        # print(variants[0][0])
 
-        print("Mapping...", file=sys.stderr)
-        self.data = [i.add_variant(k[0]) for i in snsets for k in variants if k[1]==i.number]
-        print("Mapped!", file=sys.stderr)        
+        # print("Mapping...", file=sys.stderr)
+        # self.data = [print(i.add_variant(k[0][0])) for i in snsets for k in variants if k[0][1]==i.number]
+        # print("Mapped!", file=sys.stderr)        
 
         # print(self.__dict__)
         # for i in snsets:
