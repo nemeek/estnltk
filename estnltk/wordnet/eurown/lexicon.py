@@ -111,11 +111,17 @@ class Lexicon(object):
             if k in self._xml_attrs and v:
                 self.__dict__[k] = v
 
-        print('Reading synsets...', sys.stderr)
+        print('Reading synsets...', file=sys.stderr)
         snsets = [_msn(x) for x in root.xpath("//*[local-name()='Synset']")]
-        print('Reading variants...', sys.stderr)
+        print('Reading variants...', file=sys.stderr)
         variants = [_mvar(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
-        print('Variants read!', sys.stderr)
+        print('Variants read!', file=sys.stderr)
+        print(snsets[0])
+        print(variants[0][0][0])
+
+        print("Mapping...", file=sys.stderr)
+        self.data = [i.add_variant(k[0]) for i in snsets for k in variants if k[1]==i.number]
+        print("Mapped!", file=sys.stderr)        
 
         # print(self.__dict__)
         # for i in snsets:
@@ -125,14 +131,14 @@ class Lexicon(object):
         #     for k in i:
         #         print(k[0])
 
-        vs = [y for x in variants for y in x]
+        # vs = [y for x in variants for y in x]
 
-        while vs:
-            vse = vs.pop()
-            snsi = [x.add_variant(vse[0]) for x in snsets if (x.number == vse[-1])]
-            self.data.append(snsi[0])
-            # if len(snsi[0].variants) > 1:
-            #     print(snsi[0])
+        # while vs:
+        #     vse = vs.pop()
+        #     snsi = [x.add_variant(vse[0]) for x in snsets if (x.number == vse[-1])]
+        #     self.data.append(snsi[0])
+        #     # if len(snsi[0].variants) > 1:
+        #     #     print(snsi[0])
                     
 
         # return True

@@ -68,7 +68,7 @@ vabatahtliku liikumise võime ja närvisüsteemi olemasolu"
 
     lex = eurown.Lexicon(filename='data/estwn-et-2.1.0.wip.xml')
     lex.read_xml()
-    print(len(self))
+    print(len(lex.data))
 
 if __name__ == "__main__":
     main()
