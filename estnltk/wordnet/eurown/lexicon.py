@@ -129,12 +129,44 @@ def make_variant(element: etree.Element, synset: str = None) -> Variant:
         return variant[0]
     else:
         return None # Should rise error
+
+    
+def make_sense(element: etree.Element) -> Variant:
+    """Reads Sense element and adds correspongind LexicalEntry/Lemma[writtenForm]
+
+    Parameters
+    ----------
+    element
+        element in which to search
+
+    Returns
+    -------
+    Variant
+        based on Sense
+
+    """
+    lexical_entry = element.getparent()
+    lexical_entry_id =  lexical_entry.get('id')
+    lemma_element = lexical_entry[0] # Või findall? Kas neid on parajasti 1?
+    lemma = lemma_element.get('writtenForm')
+    sense_id = element.get('id')
+    examples = element.findall('Example')
+    status = element.get('status')
+    note = element.get('note')
+    synset = element.get('synset')
+
+    variant = Variant(
+        literal = lemma,
+        sense = sense_id,
+        examples = _mex(examples),
+        status = status,
+        synset = synset)
+
+    return variant
     
 
 def _mex(iList):
     return [Example(x.text) for x in iList]
-
-
 
 
 class Lexicon(object):
@@ -186,11 +218,36 @@ class Lexicon(object):
         print('Reading variants...', file=sys.stderr)
         otsing = 'estwn-et-266-n'
         # variants = [make_variant(x,y) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(y.number)) for y in snsets]
-        variants = [make_variant(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
+        # variants = [make_variant(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
+        
+        senses = [make_sense(x) for x in root.xpath("//*[local-name()='Sense']")]
+
 
         # synohulgad = [print(x.add_variant(make_variant(v, x.number))) for x in snsets for v in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(x.number))]
         
-        print('Variants read!', file=sys.stderr)
+        print('Senses read!', file=sys.stderr)
+
+        for i in senses[:4]:
+            print (i.synset)
+
+        
+        senses.sort(key=lambda sense: sense.synset)
+
+        for i in senses[:4]:
+            print (i.synset)
+
+        # tõmba kokku
+        for i in snsets:
+            while senses:
+                variant = senses.pop(0)
+                if i.number == variant.synset:
+                    i.add_variant(variant)
+                else:
+                    senses.insert(0,variant)
+
+        print (snsets[:2])
+        
+        
         # print(snsets[0])
         # print(15*'#')
         # for i in variants:
