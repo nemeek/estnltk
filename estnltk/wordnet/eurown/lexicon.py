@@ -211,6 +211,8 @@ class Lexicon(object):
         snsets = [make_synset(x) for x in root.xpath("//*[local-name()='Synset']")]
         snsets.sort(key=lambda synset: synset.number)
 
+        print ('Number of synsets: {}'.format(len(snsets)))
+
         for i in snsets[:4]:
             print (i.number)
 
@@ -237,16 +239,10 @@ class Lexicon(object):
             print (i.synset)
 
         # tõmba kokku
-        for i in snsets:
-            while senses:
-                variant = senses.pop(0)
-                if i.number == variant.synset:
-                    i.add_variant(variant)
-                else:
-                    senses.insert(0,variant)
+        pikkus = len(snsets)
 
-        print (snsets[:2])
-        
+        ss = [i.add_variants([k for k in senses if k.synset == i.number]) for i in snsets ]
+        print(len(ss))
         
         # print(snsets[0])
         # print(15*'#')
