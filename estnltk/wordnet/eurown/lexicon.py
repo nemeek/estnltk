@@ -177,6 +177,10 @@ class Lexicon(object):
 
         print('Reading synsets...', file=sys.stderr)
         snsets = [make_synset(x) for x in root.xpath("//*[local-name()='Synset']")]
+        snsets.sort(key=lambda synset: synset.number)
+
+        for i in snsets[:4]:
+            print (i.number)
 
         
         print('Reading variants...', file=sys.stderr)
