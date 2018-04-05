@@ -84,6 +84,9 @@ class Synset(object):
     def add_variant(self, variant):
         self.variants.append(variant)
         return self
+
+    def add_variants(self, variants):
+        self.variants = variants
         
     def add_internal_link(self, internal_link):
         self.internal_links.append(internal_link)
