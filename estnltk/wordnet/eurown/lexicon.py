@@ -208,7 +208,10 @@ class Lexicon(object):
                 self.__dict__[k] = v
 
         print('Reading synsets...', file=sys.stderr)
+
+        # snsets = [make_synset(x).add_variant(make_sense(y)) for x in root.xpath("//*[local-name()='Synset']") for y in root.xpath("//*[local-name()='Sense' and ./@synset='{}']".format(x.get('id')))]
         snsets = [make_synset(x) for x in root.xpath("//*[local-name()='Synset']")]
+
         snsets.sort(key=lambda synset: synset.number)
 
         print ('Number of synsets: {}'.format(len(snsets)))
@@ -217,7 +220,7 @@ class Lexicon(object):
             print (i.number)
 
         
-        print('Reading variants...', file=sys.stderr)
+        print('Reading senses...', file=sys.stderr)
         otsing = 'estwn-et-266-n'
         # variants = [make_variant(x,y) for x in root.xpath("//*[local-name()='LexicalEntry' and ./Sense[@synset='{}']]".format(y.number)) for y in snsets]
         # variants = [make_variant(x) for x in root.xpath("//*[local-name()='LexicalEntry']")]
@@ -229,20 +232,20 @@ class Lexicon(object):
         
         print('Senses read!', file=sys.stderr)
 
-        for i in senses[:4]:
-            print (i.synset)
+        # for i in senses[:4]:
+        #     print (i.synset)
 
         
-        senses.sort(key=lambda sense: sense.synset)
+        # senses.sort(key=lambda sense: sense.synset)
 
-        for i in senses[:4]:
-            print (i.synset)
+        # for i in senses[:4]:
+        #     print (i.synset)
 
-        # tõmba kokku
-        pikkus = len(snsets)
+        # # tõmba kokku
+        # pikkus = len(snsets)
 
-        ss = [i.add_variants([k for k in senses if k.synset == i.number]) for i in snsets ]
-        print(len(ss))
+        # ss = [i.add_variants([k for k in senses if k.synset == i.number]) for i in snsets ]
+        # print(len(ss))
         
         # print(snsets[0])
         # print(15*'#')
@@ -298,6 +301,18 @@ class Lexicon(object):
         """Reads xml file (self.filename)
 
         """
-        pass
-    
-        
+        root = etree.parse(self.filename)
+        lex = root.find('Lexicon')
+        print (lex)
+        for k,v in lex[0].items():
+            if k in self._xml_attrs and v:
+                self.__dict__[k] = v
+
+        # print('Reading synsets...', file=sys.stderr)
+        # snsets = [make_synset(x) for x in lex.findall('Synset')]
+        # print ('Number of synsets: {}'.format(len(snsets)))
+
+        # print('Reading senses...', file=sys.stderr)
+        # senses = [make_sense(x) for x in root.xpath("/LexicalResource/Lexicon/LexicalEntry/Sense")]
+        # print('Senses read!', file=sys.stderr)
+        # print ('Number of senses: {}'.format(len(senses)))
