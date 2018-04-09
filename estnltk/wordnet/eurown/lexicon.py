@@ -1,5 +1,5 @@
-import time
-start_time = time.time()
+# import time
+# start_time = time.time()
 
 import sys
 
@@ -176,7 +176,7 @@ class Lexicon(object):
     def __init__(self, name=None, language=None,
                  version=None, filename=None,
                  confidenceScore=None, email=None, id=None, label=None,
-                 license=None, note=None, status=None):
+                 license=None, note=None, status=None, xml=None):
         self.name = name
         self.language = language
         self.version = version
@@ -192,13 +192,14 @@ class Lexicon(object):
         self._xml_attrs = ['confidenceScore','email',
                            'id','label','language','license',
                            'note','status','version']
+        self.xml = xml or None
 
     def read(self):
         "Read lexicon from Polaris file"
         self.data = read_file(self.filename)
         return True
 
-    def read_xml(self): # vana xml
+    def read_oxml(self): # vana xml
         "Read lexicon from XML file"
         root = etree.parse(self.filename)
         lex = root.xpath("//*[local-name()='Lexicon']")
@@ -297,16 +298,18 @@ class Lexicon(object):
         # print ('Kirjutasin faili {}'.format(self.filename))
         # print(self.__dict__)
 
-    def read_uxml(self):
+    def read_xml(self):
         """Reads xml file (self.filename)
 
         """
         root = etree.parse(self.filename)
         lex = root.find('Lexicon')
-        print (lex)
+        # print (lex)
         for k,v in lex[0].items():
             if k in self._xml_attrs and v:
                 self.__dict__[k] = v
+
+        self.xml = root
 
         # print('Reading synsets...', file=sys.stderr)
         # snsets = [make_synset(x) for x in lex.findall('Synset')]
