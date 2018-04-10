@@ -75,7 +75,12 @@ def readlex():
     lex.read_uxml()
     # print(len(lex.data))
 
+def test_wn():
+    from wn import synsets
+    synsets('jama')
+
     
 
 if __name__ == "__main__":
-    readlex()
+    # readlex()
+    test_wn()
