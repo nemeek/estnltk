@@ -77,7 +77,7 @@ def readlex():
 
 def test_wn():
     from wn import synsets
-    synsets('jama')
+    synsets('käima')
 
     
 

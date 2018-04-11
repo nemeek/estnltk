@@ -32,15 +32,20 @@ def synsets(lemma: str, pos: str = None) -> list:
     print (synset_ids)
 
     _synsets = [make_synset(x) for x in LEX.xml.xpath("/LexicalResource/Lexicon/Synset") if x.get('id') in synset_ids ]
-    print (_synsets)
+    
+
     for i in _synsets:
-        print(i)
+        variants = [make_sense(x) for x in LEX.xml.xpath("/LexicalResource/Lexicon/LexicalEntry/Sense") if x.attrib['synset'] == i.number]
+        i.add_variants(variants)
 
-    _ssynsets = [x.add_variant(make_variant(v,x.number)) for x in _synsets for v in LEX.xml.xpath("/LexicalResource/Lexicon/LexicalEntry") if x.number in [i.attrib['synset'] for i in v.findall('Sense')]]
+    # print (_synsets)
+    # for i in _synsets:
+    #     print(i)
 
-    print (_ssynsets)
-    for i in _ssynsets:
-        print(i)
+    # print(len(_synsets))
+    return _synsets
+        
+
     
 
 def test(lemma: str) -> None:
